@@ -16,5 +16,16 @@ module Capistrano
     def define_tasks
       eval_rakefile File.expand_path('../../tasks/nginx.rake', __FILE__)
     end
+
+    def sudo_if_needed(command)
+      if fetch(:puma_nginx_use_sudo)
+        backend.sudo command
+      else
+        puma_role = fetch(:puma_role)
+        backend.on(puma_role) do
+          backend.execute command
+        end
+      end
+    end
   end
 end
